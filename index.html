@@ -5,305 +5,273 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Network Graph</title>
     
-    <!-- Fonts: Rubik for excellent Hebrew support -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
     
-    <!-- React & ReactDOM -->
+    <!-- React & Tailwind -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
-    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- D3.js for Graph Physics -->
+    <!-- D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
 
-    <style>
-        body { font-family: 'Rubik', sans-serif; background-color: #0f172a; color: #e2e8f0; overflow: hidden; }
-        
-        /* Custom Scrollbar for cards */
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #1e293b; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-        
-        /* Hide scrollbar for the main canvas container */
-        .no-scroll { overflow: hidden; }
-
-        /* Smooth transitions */
-        .node-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        /* Glassmorphism for UI elements */
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-    </style>
-    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3b82f6',
-                        secondary: '#64748b',
-                        accent: '#f43f5e',
                         dark: '#0f172a',
-                        card: '#1e293b'
+                        card: '#1e293b',
+                        primary: '#3b82f6',
+                        accent: '#f43f5e'
                     }
                 }
             }
         }
     </script>
+
+    <style>
+        body { 
+            font-family: 'Rubik', sans-serif; 
+            background-color: #0f172a; 
+            color: #e2e8f0; 
+            margin: 0; 
+            overflow: hidden; 
+        }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        .glass { 
+            background: rgba(30, 41, 59, 0.85); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        #error-container {
+            display: none;
+            position: fixed;
+            top: 20px; left: 20px; right: 20px;
+            padding: 20px; background: #7f1d1d; color: white;
+            z-index: 9999; border-radius: 8px; border: 1px solid #f87171;
+            font-family: monospace; direction: ltr;
+        }
+    </style>
 </head>
 <body>
+    <div id="error-container"></div>
     <div id="root"></div>
 
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            const el = document.getElementById('error-container');
+            el.style.display = 'block';
+            el.innerHTML = `<strong>Runtime Error:</strong><br/>${message}<br/><small>${source}:${lineno}</small>`;
+        };
+    </script>
+
     <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo, useCallback } = React;
-        const { Search, ExternalLink, X, ZoomIn, ZoomOut, Link: LinkIcon, User, RefreshCw } = lucide;
+        const { useState, useEffect, useRef, useMemo } = React;
 
-        // --- Configuration ---
-        // Change this to the path where your JSON files are hosted on GitHub Pages
-        // e.g., "https://raw.githubusercontent.com/username/repo/main/data"
-        // For this demo, we use a relative path assuming local server or same folder structure
-        const DATA_BASE_URL = "./people"; 
+        // --- CONFIGURATION ---
+        // Pointing directly to your GitHub Pages URL
+        const DATA_BASE_URL = "https://r4dical-admin.github.io/Sunlight/people";
 
-        const GraphApp = () => {
+        // --- INLINE ICONS ---
+        const Icons = {
+            Search: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+            X: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
+            User: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+            Link: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>,
+            ExternalLink: () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
+            Refresh: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        };
+
+        const App = () => {
             const [nodes, setNodes] = useState([]);
             const [links, setLinks] = useState([]);
             const [loading, setLoading] = useState(true);
             const [searchTerm, setSearchTerm] = useState("");
             const [selectedNodeId, setSelectedNodeId] = useState(null);
-            const [error, setError] = useState(null);
             
-            // D3 Refs
             const svgRef = useRef(null);
-            const containerRef = useRef(null);
             const simulationRef = useRef(null);
             const zoomRef = useRef(null);
 
-            // Fetch Data Logic
-            const loadData = async () => {
-                setLoading(true);
-                setError(null);
-                try {
-                    // 1. Fetch the manifest (list of people files)
-                    // In a real scenario, this fetches index.json. 
-                    // Fallback to mock data for the Preview if fetch fails (so you can see it working now).
+            // Fetch Data
+            useEffect(() => {
+                const load = async () => {
+                    setLoading(true);
                     let peopleList = [];
+
+                    // 1. Fetch Index from GitHub Repo
                     try {
-                        const response = await fetch(`${DATA_BASE_URL}/index.json`);
-                        if (!response.ok) throw new Error("Index not found");
-                        peopleList = await response.json();
+                        console.log(`Fetching index from: ${DATA_BASE_URL}/index.json`);
+                        const res = await fetch(`${DATA_BASE_URL}/index.json`);
+                        if (!res.ok) throw new Error(`Index not found at ${DATA_BASE_URL}/index.json (Status: ${res.status})`);
+                        peopleList = await res.json();
                     } catch (e) {
-                        console.warn("Could not fetch index.json, using Mock Data for preview.");
-                        peopleList = ["cohen.json", "levi.json", "sarah.json"];
-                        
-                        // Mocking the fetch mechanism for the preview environment
-                        window.mockData = {
-                            "cohen.json": {
-                                id: "1", name: "ישראל כהן", description: "מהנדס תוכנה בכיר ופעיל קהילה.", photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Israel",
-                                positions: ["מפתח פול-סטאק בגוגל", "ראש צוות בסטארטאפ"],
-                                references: [{ title: "פרופיל לינקדאין", url: "https://linkedin.com" }],
-                                links: [{ targetId: "2", description: "עבדו יחד על פרויקט הקוד הפתוח", referenceUrl: "https://github.com" }]
-                            },
-                            "levi.json": {
-                                id: "2", name: "מיכל לוי", description: "חוקרת נתונים ומומחית AI.", photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Michal",
-                                positions: ["חוקרת בטכניון", "Data Scientist במיקרוסופט"],
-                                references: [{ title: "מאמר אקדמי", url: "#" }],
-                                links: [{ targetId: "3", description: "מנטורית בתוכנית המצוינות", referenceUrl: "#" }]
-                            },
-                            "sarah.json": {
-                                id: "3", name: "שרה אהרונסון", description: "מנהלת מוצר ואסטרטגיה.", photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-                                positions: ["VP Product", "יזמת"],
-                                references: [],
-                                links: [{ targetId: "1", description: "שותפה לדרך", referenceUrl: "#" }]
-                            }
-                        };
+                        console.error("Failed to load index.json:", e);
+                        // Optional: alert the user or keep loading false to show error
                     }
 
-                    // 2. Fetch individual files
-                    const loadedNodes = [];
-                    const loadedLinks = [];
+                    // 2. Load Individuals
+                    const newNodes = [];
+                    const newLinks = [];
+                    const loadedIds = new Set();
 
                     for (const filename of peopleList) {
-                        let data;
-                        if (window.mockData && window.mockData[filename]) {
-                            data = window.mockData[filename];
-                        } else {
-                            const res = await fetch(`${DATA_BASE_URL}/${filename}`);
-                            data = await res.json();
-                        }
-                        
-                        loadedNodes.push({
-                            id: data.id,
-                            name: data.name,
-                            description: data.description,
-                            photo: data.photo,
-                            positions: data.positions || [],
-                            references: data.references || [],
-                            // Initial coordinates (optional, helps d3 settle)
-                            x: Math.random() * 800,
-                            y: Math.random() * 600,
-                            val: 1 // size weight
-                        });
-
-                        // Process outgoing links
-                        if (data.links) {
-                            data.links.forEach(link => {
-                                loadedLinks.push({
-                                    source: data.id,
-                                    target: link.targetId,
-                                    description: link.description,
-                                    referenceUrl: link.referenceUrl
+                        try {
+                            const url = `${DATA_BASE_URL}/${filename}`;
+                            const res = await fetch(url);
+                            if (res.ok) {
+                                const data = await res.json();
+                                loadedIds.add(data.id);
+                                newNodes.push({ 
+                                    ...data, 
+                                    x: Math.random() * 800, 
+                                    y: Math.random() * 600 
                                 });
-                            });
+                            } else {
+                                console.warn(`Failed to fetch ${url}`);
+                            }
+                        } catch (e) {
+                            console.error(`Error loading ${filename}`, e);
                         }
                     }
 
-                    setNodes(loadedNodes);
-                    setLinks(loadedLinks);
-                } catch (err) {
-                    console.error(err);
-                    setError("שגיאה בטעינת הנתונים. וודא שהקבצים קיימים.");
-                } finally {
-                    setLoading(false);
-                }
-            };
+                    // 3. Parse Links
+                    newNodes.forEach(node => {
+                        if (node.links) {
+                            node.links.forEach(link => {
+                                // Only add link if target node actually loaded
+                                if (loadedIds.has(link.targetId)) {
+                                    newLinks.push({
+                                        source: node.id,
+                                        target: link.targetId,
+                                        description: link.description,
+                                        referenceUrl: link.referenceUrl
+                                    });
+                                }
+                            });
+                        }
+                    });
 
-            useEffect(() => {
-                loadData();
+                    setNodes(newNodes);
+                    setLinks(newLinks);
+                    setLoading(false);
+                };
+
+                load();
             }, []);
 
-            // D3 Simulation Setup
+            // D3 Engine
             useEffect(() => {
                 if (loading || nodes.length === 0) return;
 
                 const width = window.innerWidth;
                 const height = window.innerHeight;
 
-                // Clear previous simulation
                 if (simulationRef.current) simulationRef.current.stop();
 
-                // Create Simulation
+                const svg = d3.select(svgRef.current);
+                svg.selectAll("*").remove();
+
+                const g = svg.append("g");
+
+                const zoom = d3.zoom()
+                    .scaleExtent([0.1, 4])
+                    .on("zoom", (e) => g.attr("transform", e.transform));
+                
+                svg.call(zoom);
+                zoomRef.current = zoom;
+
                 const simulation = d3.forceSimulation(nodes)
-                    .force("link", d3.forceLink(links).id(d => d.id).distance(150))
-                    .force("charge", d3.forceManyBody().strength(-500))
+                    .force("link", d3.forceLink(links).id(d => d.id).distance(200))
+                    .force("charge", d3.forceManyBody().strength(-800))
                     .force("center", d3.forceCenter(width / 2, height / 2))
                     .force("collide", d3.forceCollide().radius(60));
 
                 simulationRef.current = simulation;
 
-                // Create SVG Elements
-                const svg = d3.select(svgRef.current);
-                svg.selectAll("*").remove(); // Clear canvas
-
-                // Zoom wrapper group
-                const g = svg.append("g");
-
-                // Zoom Behavior
-                const zoom = d3.zoom()
-                    .scaleExtent([0.1, 4])
-                    .on("zoom", (event) => {
-                        g.attr("transform", event.transform);
-                    });
-                
-                d3.select(svgRef.current).call(zoom);
-                zoomRef.current = zoom;
-
-                // Draw Links
+                // Draw Lines
                 const linkElements = g.append("g")
                     .attr("stroke", "#475569")
                     .attr("stroke-opacity", 0.6)
                     .selectAll("line")
                     .data(links)
                     .join("line")
-                    .attr("stroke-width", 1.5)
-                    .attr("class", "cursor-pointer hover:stroke-accent transition-colors duration-300")
-                    .on("click", (e, d) => {
-                         // Optional: Handle link click specifically if needed
-                    });
+                    .attr("stroke-width", 2);
 
-                // Draw Link Labels (invisible hit area for easier clicking + tooltip logic could go here)
-                
-                // Draw Nodes (Using ForeignObject to render HTML inside SVG is tricky with z-index, 
-                // so we usually render nodes as standard SVG or overlay. 
-                // Here we will use SVG groups for performance, but careful DOM overlay for expanded state)
-                
-                const nodeGroup = g.append("g")
-                    .selectAll(".node")
+                // Draw Nodes
+                const nodeElements = g.append("g")
+                    .selectAll("g")
                     .data(nodes)
                     .join("g")
-                    .attr("class", "node cursor-pointer")
+                    .attr("class", "cursor-pointer")
                     .call(d3.drag()
-                        .on("start", dragstarted)
-                        .on("drag", dragged)
-                        .on("end", dragended));
+                        .on("start", (e, d) => {
+                            if (!e.active) simulation.alphaTarget(0.3).restart();
+                            d.fx = d.x;
+                            d.fy = d.y;
+                        })
+                        .on("drag", (e, d) => {
+                            d.fx = e.x;
+                            d.fy = e.y;
+                        })
+                        .on("end", (e, d) => {
+                            if (!e.active) simulation.alphaTarget(0);
+                            d.fx = null;
+                            d.fy = null;
+                        }));
 
-                // Node Circle (Background)
-                nodeGroup.append("circle")
-                    .attr("r", 25)
+                nodeElements.append("circle")
+                    .attr("r", 32)
                     .attr("fill", "#1e293b")
                     .attr("stroke", "#3b82f6")
                     .attr("stroke-width", 2);
 
-                // Node Image (Clip Path)
                 const defs = svg.append("defs");
-                nodes.forEach((node, i) => {
+                nodes.forEach(n => {
                     defs.append("pattern")
-                        .attr("id", `image-${node.id}`)
+                        .attr("id", `img-${n.id}`)
                         .attr("height", "100%")
                         .attr("width", "100%")
                         .attr("patternContentUnits", "objectBoundingBox")
                         .append("image")
                         .attr("height", 1)
                         .attr("width", 1)
-                        .attr("preserveAspectRatio", "none")
-                        .attr("href", node.photo || "https://via.placeholder.com/50");
+                        .attr("preserveAspectRatio", "xMidYMid slice")
+                        .attr("href", n.photo);
                 });
 
-                nodeGroup.append("circle")
-                    .attr("r", 23)
-                    .attr("fill", d => `url(#image-${d.id})`);
+                nodeElements.append("circle")
+                    .attr("r", 30)
+                    .attr("fill", d => `url(#img-${d.id})`);
 
-                // Text Label (Always visible)
-                nodeGroup.append("text")
-                    .attr("dy", 40)
+                nodeElements.append("text")
+                    .attr("dy", 55)
                     .attr("text-anchor", "middle")
                     .text(d => d.name)
                     .attr("fill", "#e2e8f0")
-                    .attr("font-size", "12px")
-                    .attr("font-weight", "bold")
+                    .attr("font-size", "14px")
+                    .attr("font-weight", "500")
                     .style("pointer-events", "none")
-                    .style("text-shadow", "0 1px 3px rgba(0,0,0,0.8)");
+                    .style("text-shadow", "0 2px 4px rgba(0,0,0,0.9)");
 
-                // Click Handler
-                nodeGroup.on("click", (event, d) => {
-                    event.stopPropagation();
+                nodeElements.on("click", (e, d) => {
+                    e.stopPropagation();
                     setSelectedNodeId(d.id);
-                    // Center the view on the node
-                    const scale = 1.5;
-                    const x = -d.x * scale + window.innerWidth / 2;
-                    const y = -d.y * scale + window.innerHeight / 2;
-                    
                     svg.transition().duration(750).call(
                         zoom.transform,
-                        d3.zoomIdentity.translate(x, y).scale(scale)
+                        d3.zoomIdentity.translate(width/2, height/2).scale(1.2).translate(-d.x, -d.y)
                     );
                 });
 
                 svg.on("click", () => setSelectedNodeId(null));
 
-                // Tick Function
                 simulation.on("tick", () => {
                     linkElements
                         .attr("x1", d => d.source.x)
@@ -311,224 +279,95 @@
                         .attr("x2", d => d.target.x)
                         .attr("y2", d => d.target.y);
 
-                    nodeGroup.attr("transform", d => `translate(${d.x},${d.y})`);
+                    nodeElements.attr("transform", d => `translate(${d.x},${d.y})`);
                 });
 
-                function dragstarted(event, d) {
-                    if (!event.active) simulation.alphaTarget(0.3).restart();
-                    d.fx = d.x;
-                    d.fy = d.y;
-                }
+            }, [nodes, links, loading]);
 
-                function dragged(event, d) {
-                    d.fx = event.x;
-                    d.fy = event.y;
-                }
-
-                function dragended(event, d) {
-                    if (!event.active) simulation.alphaTarget(0);
-                    d.fx = null;
-                    d.fy = null;
-                }
-
-            }, [nodes, links, loading]); // Re-run if data changes
-
-            // Filtering based on search
+            // Filter
             useEffect(() => {
                 if (!simulationRef.current) return;
-                
                 const g = d3.select(svgRef.current).select("g");
-                const nodeElements = g.selectAll(".node");
-                
-                if (searchTerm === "") {
-                    nodeElements.attr("opacity", 1);
-                } else {
-                    nodeElements.attr("opacity", d => 
-                        d.name.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0.1
-                    );
-                }
+                g.selectAll("g").transition().attr("opacity", d => 
+                    d.name.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0.1
+                );
+                g.selectAll("line").transition().attr("opacity", searchTerm ? 0.05 : 0.6);
             }, [searchTerm]);
 
-            const selectedNode = useMemo(() => 
-                nodes.find(n => n.id === selectedNodeId), 
-                [selectedNodeId, nodes]
-            );
-
-            // Get links connected to selected node for the sidebar
-            const relevantLinks = useMemo(() => {
-                if (!selectedNode) return [];
-                return links.filter(l => l.source.id === selectedNode.id);
-            }, [selectedNode, links]);
-
-            // Render Lucide Icons
-            const Icon = ({ name, size=20, className }) => {
-                const LucideIcon = lucide[name];
-                if (!LucideIcon) return null;
-                return <LucideIcon size={size} className={className} />;
-            };
+            const selectedNode = nodes.find(n => n.id === selectedNodeId);
+            const nodeLinks = links.filter(l => l.source.id === selectedNodeId);
 
             return (
-                <div className="relative w-screen h-screen bg-dark overflow-hidden">
-                    
-                    {/* Header / Search Bar */}
-                    <div className="absolute top-0 left-0 right-0 p-4 z-10 flex justify-between items-start pointer-events-none">
-                        <div className="pointer-events-auto glass rounded-xl p-2 flex items-center gap-2 shadow-xl max-w-md w-full">
-                            <Search className="text-secondary w-5 h-5 mr-2" />
+                <div className="w-screen h-screen relative bg-dark">
+                    {/* Header */}
+                    <div className="absolute top-0 left-0 right-0 p-4 z-10 flex justify-between pointer-events-none">
+                        <div className="pointer-events-auto glass rounded-full px-4 py-3 flex items-center gap-3 shadow-2xl max-w-sm w-full">
+                            <span className="text-gray-400"><Icons.Search /></span>
                             <input 
-                                type="text" 
-                                placeholder="חיפוש אנשים..." 
-                                className="bg-transparent border-none outline-none text-white w-full text-right"
+                                className="bg-transparent border-none outline-none text-white w-full text-right font-medium"
+                                placeholder="חיפוש אנשים..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={e => setSearchTerm(e.target.value)}
                             />
                             {searchTerm && (
-                                <button onClick={() => setSearchTerm("")} className="text-secondary hover:text-white">
-                                    <X size={16} />
+                                <button onClick={() => setSearchTerm("")} className="text-gray-400 hover:text-white">
+                                    <Icons.X />
                                 </button>
                             )}
                         </div>
-                        <div className="pointer-events-auto">
-                           <button onClick={loadData} className="glass p-2 rounded-full hover:bg-white/10 text-white" title="רענן נתונים">
-                                <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
-                           </button>
-                        </div>
+                        <button onClick={() => window.location.reload()} className="pointer-events-auto glass p-3 rounded-full text-white hover:bg-white/10 transition">
+                            <Icons.Refresh />
+                        </button>
                     </div>
 
-                    {/* Canvas */}
-                    <svg ref={svgRef} className="w-full h-full cursor-grab active:cursor-grabbing"></svg>
+                    <svg ref={svgRef} className="w-full h-full block cursor-move active:cursor-grabbing"></svg>
 
-                    {/* Loading State */}
-                    {loading && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-dark/80 z-50">
-                            <div className="flex flex-col items-center gap-4">
-                                <RefreshCw className="animate-spin text-primary w-10 h-10" />
-                                <span className="text-xl">טוען את הגרף...</span>
-                            </div>
-                        </div>
-                    )}
-                    
-                     {/* Error State */}
-                    {error && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-dark/90 z-50">
-                            <div className="text-red-400 text-center p-6 border border-red-900 bg-red-900/20 rounded-xl">
-                                <h3 className="text-xl font-bold mb-2">שגיאה</h3>
-                                <p>{error}</p>
-                                <button onClick={loadData} className="mt-4 px-4 py-2 bg-red-600 rounded hover:bg-red-500 text-white">נסה שוב</button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Detailed Card (Overlay) */}
-                    {selectedNode && (
-                        <div className="absolute top-0 bottom-0 left-0 w-full sm:w-96 bg-card/95 backdrop-blur-md border-r border-white/10 shadow-2xl z-20 transform transition-transform duration-300 overflow-hidden flex flex-col">
-                            
-                            {/* Card Header (Image + Close) */}
-                            <div className="relative h-48 bg-gradient-to-b from-primary/20 to-card">
-                                <img 
-                                    src={selectedNode.photo} 
-                                    alt={selectedNode.name}
-                                    className="w-full h-full object-cover opacity-60"
-                                    onError={(e) => { e.target.src = "https://via.placeholder.com/400x200?text=No+Image"; }}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent"></div>
-                                <button 
-                                    onClick={() => setSelectedNodeId(null)}
-                                    className="absolute top-4 left-4 bg-black/40 p-1 rounded-full hover:bg-white/20 text-white transition-colors"
-                                >
-                                    <X size={24} />
-                                </button>
-                                <div className="absolute bottom-4 right-4 text-right">
-                                    <h2 className="text-3xl font-bold text-white">{selectedNode.name}</h2>
-                                    <p className="text-sm text-gray-300">{selectedNode.positions[0]}</p>
-                                </div>
-                            </div>
-
-                            {/* Card Body */}
-                            <div className="p-6 overflow-y-auto custom-scroll flex-1 text-right" dir="rtl">
-                                
-                                {/* About */}
-                                <div className="mb-6">
-                                    <h3 className="text-primary font-bold text-sm uppercase tracking-wider mb-2 flex items-center gap-2">
-                                        <User size={16} /> אודות
-                                    </h3>
-                                    <p className="text-gray-300 leading-relaxed text-sm">
-                                        {selectedNode.description}
-                                    </p>
-                                </div>
-
-                                {/* Positions */}
-                                <div className="mb-6">
-                                    <h3 className="text-primary font-bold text-sm uppercase tracking-wider mb-2">תפקידים</h3>
-                                    <div className="flex flex-wrap gap-2">
-                                        {selectedNode.positions.map((pos, idx) => (
-                                            <span key={idx} className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-xs text-gray-300">
-                                                {pos}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Connections / Links defined in JSON */}
-                                {relevantLinks.length > 0 && (
-                                    <div className="mb-6">
-                                        <h3 className="text-primary font-bold text-sm uppercase tracking-wider mb-2 flex items-center gap-2">
-                                            <LinkIcon size={16} /> קשרים
-                                        </h3>
-                                        <div className="space-y-3">
-                                            {relevantLinks.map((link, idx) => (
-                                                <div key={idx} className="bg-white/5 p-3 rounded-lg border-r-2 border-primary/50 hover:bg-white/10 transition-colors">
-                                                    <div className="flex justify-between items-center mb-1">
-                                                        <span className="font-bold text-white text-sm">מקושר ל: {link.target.name}</span>
-                                                    </div>
-                                                    <p className="text-xs text-gray-400 mb-2">{link.description}</p>
-                                                    {link.referenceUrl && link.referenceUrl !== "#" && (
-                                                        <a 
-                                                            href={link.referenceUrl} 
-                                                            target="_blank" 
-                                                            rel="noreferrer"
-                                                            className="text-xs text-accent flex items-center gap-1 hover:underline w-fit"
-                                                        >
-                                                            <ExternalLink size={10} /> המקור לחיבור
-                                                        </a>
-                                                    )}
-                                                </div>
+                    {/* Sidebar */}
+                    <div className={`absolute top-0 left-0 h-full w-full sm:w-96 bg-card/95 backdrop-blur-xl shadow-2xl z-20 transition-transform duration-300 transform border-r border-white/10 flex flex-col ${selectedNode ? 'translate-x-0' : '-translate-x-full'}`}>
+                        {selectedNode && (
+                            <>
+                                <div className="h-56 relative bg-gray-900">
+                                    <img src={selectedNode.photo} className="w-full h-full object-cover opacity-60" onError={(e) => e.target.style.opacity = 0.2} />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent"></div>
+                                    <button onClick={() => setSelectedNodeId(null)} className="absolute top-4 left-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full transition backdrop-blur-sm">
+                                        <Icons.X />
+                                    </button>
+                                    <div className="absolute bottom-4 right-4 text-right">
+                                        <h2 className="text-3xl font-bold text-white mb-1 drop-shadow-lg">{selectedNode.name}</h2>
+                                        <div className="flex flex-wrap gap-2 justify-end">
+                                            {selectedNode.positions.slice(0, 2).map((p, i) => (
+                                                <span key={i} className="text-xs bg-primary/20 text-blue-200 px-2 py-0.5 rounded border border-primary/20 backdrop-blur-md">{p}</span>
                                             ))}
                                         </div>
                                     </div>
-                                )}
-
-                                {/* References */}
-                                {selectedNode.references.length > 0 && (
-                                    <div className="mb-6">
-                                        <h3 className="text-primary font-bold text-sm uppercase tracking-wider mb-2 flex items-center gap-2">
-                                            <ExternalLink size={16} /> מקורות
-                                        </h3>
-                                        <ul className="space-y-2">
-                                            {selectedNode.references.map((ref, idx) => (
-                                                <li key={idx}>
-                                                    <a 
-                                                        href={ref.url} 
-                                                        target="_blank" 
-                                                        rel="noreferrer" 
-                                                        className="block bg-white/5 p-2 rounded hover:bg-primary/20 transition text-sm text-blue-300 truncate"
-                                                    >
-                                                        {ref.title}
-                                                    </a>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<GraphApp />);
-    </script>
-</body>
-</html>
-
+                                </div>
+                                <div className="flex-1 overflow-y-auto custom-scroll p-6 text-right space-y-8" dir="rtl">
+                                    <section>
+                                        <h3 className="text-primary text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2"><Icons.User /> אודות</h3>
+                                        <p className="text-gray-300 leading-relaxed text-sm">{selectedNode.description}</p>
+                                    </section>
+                                    {nodeLinks.length > 0 && (
+                                        <section>
+                                            <h3 className="text-primary text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2"><Icons.Link /> קשרים ({nodeLinks.length})</h3>
+                                            <div className="space-y-3">
+                                                {nodeLinks.map((link, idx) => (
+                                                    <div key={idx} className="bg-white/5 p-4 rounded-xl border border-white/5 hover:border-primary/30 transition group">
+                                                        <div className="font-bold text-white mb-1 text-sm">מקושר ל: <span className="text-blue-300">{link.target.name}</span></div>
+                                                        <p className="text-xs text-gray-400 mb-3">{link.description}</p>
+                                                        {link.referenceUrl && (
+                                                            <a href={link.referenceUrl} target="_blank" className="inline-flex items-center gap-1 text-xs text-accent hover:text-white transition"><Icons.ExternalLink /> המקור לחיבור</a>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </section>
+                                    )}
+                                    {selectedNode.references && selectedNode.references.length > 0 && (
+                                        <section>
+                                            <h3 className="text-primary text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2"><Icons.ExternalLink /> מקורות נוספים</h3>
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {selectedNode.references.map((ref, i) => (
+                                                    <a key={i} href={ref.url} target="_blank" className="block bg-white/5 px-4 py-3 rounded-lg text-sm text-gray-300 hover:bg-white/10 hover:text-white transition flex justify-between items-center group">
+                                                        <span>{ref.title}</span>
+                                                        <span className="opacity-0 group-hover:opacity-100 transition-opacity"><Icons.ExternalLink /></span>
+                                            
