@@ -1,0 +1,33 @@
+{
+  "id": "1",
+  "name": "ישראל כהן",
+  "description": "מפתח בכיר המתמחה במערכות מבוזרות. פעיל נלהב בקהילת הקוד הפתוח בישראל.",
+  "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Israel",
+  "positions": [
+    "Tech Lead @ Google",
+    "Founder @ StartUpNation",
+    "Senior Dev @ Microsoft"
+  ],
+  "references": [
+    {
+      "title": "פרופיל לינקדאין",
+      "url": "https://linkedin.com"
+    },
+    {
+      "title": "בלוג אישי",
+      "url": "https://medium.com"
+    }
+  ],
+  "links": [
+    {
+      "targetId": "2",
+      "description": "עבדו יחד על פרויקט התשתית הלאומית ב-2019",
+      "referenceUrl": "https://github.com/project-link"
+    },
+    {
+      "targetId": "3",
+      "description": "הנחה את גולדברג במהלך התואר השני",
+      "referenceUrl": "https://university.edu/thesis"
+    }
+  ]
+}
