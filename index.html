@@ -7,7 +7,6 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-QDMTXL7RTR');
     </script>
 
@@ -29,9 +28,6 @@
     <!-- D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
-    <!-- YAML Parser (for Frontmatter) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-
     <script>
         tailwind.config = {
             theme: {
@@ -48,33 +44,22 @@
     </script>
 
     <style>
-        body { 
-            font-family: 'Rubik', sans-serif; 
-            background-color: #0f172a; 
-            color: #e2e8f0; 
-            margin: 0; 
-            overflow: hidden; 
-        }
+        html, body, #root { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; font-family: 'Rubik', sans-serif; background-color: #0f172a; color: #e2e8f0; }
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: #1e293b; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-        .glass { 
-            background: rgba(30, 41, 59, 0.85); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-        }
+        .glass { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo } = React;
+        const { useState, useEffect, useRef } = React;
 
         // --- CONFIGURATION ---
         const DATA_BASE_URL = "https://r4dical-admin.github.io/Sunlight/people";
 
-        // --- INLINE ICONS ---
         const Icons = {
             Search: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>),
             X: () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>),
@@ -90,75 +75,64 @@
             const [loading, setLoading] = useState(true);
             const [searchTerm, setSearchTerm] = useState("");
             const [selectedNodeId, setSelectedNodeId] = useState(null);
+            const [logs, setLogs] = useState([]); 
             
             const svgRef = useRef(null);
             const simulationRef = useRef(null);
             const zoomRef = useRef(null);
 
-            // --- MARKDOWN PARSER HELPER ---
-            const parseMarkdown = (text) => {
-                const regex = /^---\s*([\s\S]*?)\s*---\s*([\s\S]*)$/;
-                const match = text.match(regex);
-                
-                if (match) {
-                    try {
-                        const frontmatter = jsyaml.load(match[1]); // Parse YAML
-                        const body = match[2].trim(); // Get Description
-                        return { ...frontmatter, description: body };
-                    } catch (e) {
-                        console.error("YAML Parse Error:", e);
-                        return null;
-                    }
-                }
-                return null;
+            const addLog = (msg) => {
+                setLogs(prev => [...prev, msg]);
+                console.log("[GraphDebug]", msg);
             };
 
             useEffect(() => {
                 const load = async () => {
                     setLoading(true);
+                    setLogs([]);
+                    addLog("Starting JSON Load...");
+                    
                     let peopleFiles = [];
-
                     try {
-                        console.log(`Fetching index from: ${DATA_BASE_URL}/index.json`);
-                        const res = await fetch(`${DATA_BASE_URL}/index.json`);
-                        if (!res.ok) throw new Error(`Index not found (Status: ${res.status})`);
+                        const res = await fetch(`${DATA_BASE_URL}/index.json?v=${Date.now()}`); 
+                        if (!res.ok) throw new Error(`Status ${res.status}`);
                         peopleFiles = await res.json();
+                        addLog(`Index loaded: ${peopleFiles.length} files found.`);
                     } catch (e) {
-                        console.error("Failed to load index.json:", e);
+                        addLog(`Index fetch failed: ${e.message}`);
+                        addLog(`Check URL: ${DATA_BASE_URL}/index.json`);
+                        setLoading(false);
+                        return;
                     }
 
                     const newNodes = [];
-                    const newLinks = [];
                     const loadedIds = new Set();
 
                     for (const filename of peopleFiles) {
                         try {
-                            const url = `${DATA_BASE_URL}/${filename}`;
-                            const res = await fetch(url);
-                            if (res.ok) {
-                                const text = await res.text();
-                                
-                                let data = null;
-                                if (filename.endsWith('.json')) {
-                                    data = JSON.parse(text);
-                                } else if (filename.endsWith('.md')) {
-                                    data = parseMarkdown(text);
-                                }
+                            const fileUrl = `${DATA_BASE_URL}/${filename}?v=${Date.now()}`;
+                            const res = await fetch(fileUrl);
+                            if (!res.ok) {
+                                addLog(`Failed to fetch ${filename}: ${res.status}`);
+                                continue;
+                            }
+                            
+                            // Pure JSON parsing
+                            const data = await res.json();
 
-                                if (data) {
-                                    loadedIds.add(data.id);
-                                    newNodes.push({ 
-                                        ...data, 
-                                        x: Math.random() * 800, 
-                                        y: Math.random() * 600 
-                                    });
-                                }
+                            if (data && data.id) {
+                                loadedIds.add(data.id);
+                                newNodes.push({ ...data, x: Math.random() * 800, y: Math.random() * 600 });
+                                addLog(`Loaded: ${data.name}`);
+                            } else {
+                                addLog(`Invalid JSON structure in ${filename}`);
                             }
                         } catch (e) {
-                            console.error(`Error loading ${filename}`, e);
+                            addLog(`Error processing ${filename}: ${e.message}`);
                         }
                     }
 
+                    const newLinks = [];
                     newNodes.forEach(node => {
                         if (node.links) {
                             node.links.forEach(link => {
@@ -169,21 +143,30 @@
                                         description: link.description || link.desc,
                                         referenceUrl: link.referenceUrl
                                     });
+                                } else {
+                                    addLog(`Link Error: Target ${link.targetId} not found for ${node.name}`);
                                 }
                             });
                         }
                     });
 
-                    setNodes(newNodes);
-                    setLinks(newLinks);
+                    if (newNodes.length > 0) {
+                        setNodes(newNodes);
+                        setLinks(newLinks);
+                    } else {
+                        addLog("CRITICAL: No valid nodes found.");
+                    }
+                    
                     setLoading(false);
                 };
+                
                 load();
             }, []);
 
+            // D3 Simulation
             useEffect(() => {
-                if (loading || nodes.length === 0) return;
-
+                if (nodes.length === 0) return;
+                
                 const width = window.innerWidth;
                 const height = window.innerHeight;
 
@@ -193,165 +176,103 @@
                 svg.selectAll("*").remove();
 
                 const g = svg.append("g");
-
-                const zoom = d3.zoom()
-                    .scaleExtent([0.1, 4])
-                    .on("zoom", (e) => g.attr("transform", e.transform));
-                
+                const zoom = d3.zoom().scaleExtent([0.1, 4]).on("zoom", (e) => g.attr("transform", e.transform));
                 svg.call(zoom);
                 zoomRef.current = zoom;
 
                 const simulation = d3.forceSimulation(nodes)
                     .force("link", d3.forceLink(links).id(d => d.id).distance(200))
-                    .force("charge", d3.forceManyBody().strength(-800))
+                    .force("charge", d3.forceManyBody().strength(-500))
                     .force("center", d3.forceCenter(width / 2, height / 2))
                     .force("collide", d3.forceCollide().radius(60));
 
                 simulationRef.current = simulation;
 
-                const linkElements = g.append("g")
-                    .attr("stroke", "#475569")
-                    .attr("stroke-opacity", 0.6)
-                    .selectAll("line")
-                    .data(links)
-                    .join("line")
-                    .attr("stroke-width", 2);
+                const linkElements = g.append("g").attr("stroke", "#94a3b8").selectAll("line")
+                    .data(links).join("line").attr("stroke-width", 2).attr("opacity", 0.6);
 
-                const nodeElements = g.append("g")
-                    .selectAll("g")
-                    .data(nodes)
-                    .join("g")
-                    .attr("class", "cursor-pointer")
+                const nodeElements = g.append("g").selectAll("g")
+                    .data(nodes).join("g").attr("class", "cursor-pointer")
                     .call(d3.drag()
                         .on("start", (e, d) => {
                             if (!e.active) simulation.alphaTarget(0.3).restart();
-                            d.fx = d.x;
-                            d.fy = d.y;
+                            d.fx = d.x; d.fy = d.y;
                         })
-                        .on("drag", (e, d) => {
-                            d.fx = e.x;
-                            d.fy = e.y;
-                        })
+                        .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
                         .on("end", (e, d) => {
                             if (!e.active) simulation.alphaTarget(0);
-                            d.fx = null;
-                            d.fy = null;
+                            d.fx = null; d.fy = null;
                         }));
 
-                nodeElements.append("circle")
-                    .attr("r", 32)
-                    .attr("fill", "#1e293b")
-                    .attr("stroke", "#3b82f6")
-                    .attr("stroke-width", 2);
+                nodeElements.append("circle").attr("r", 32).attr("fill", "#3b82f6").attr("stroke", "#fff").attr("stroke-width", 2);
 
                 const defs = svg.append("defs");
                 nodes.forEach(n => {
                     if (n.photo) {
-                        defs.append("pattern")
-                            .attr("id", `img-${n.id}`)
-                            .attr("height", "100%")
-                            .attr("width", "100%")
-                            .attr("patternContentUnits", "objectBoundingBox")
-                            .append("image")
-                            .attr("height", 1)
-                            .attr("width", 1)
-                            .attr("preserveAspectRatio", "xMidYMid slice")
-                            .attr("href", n.photo);
+                        defs.append("pattern").attr("id", `img-${n.id}`).attr("height", "100%").attr("width", "100%").attr("patternContentUnits", "objectBoundingBox")
+                            .append("image").attr("height", 1).attr("width", 1).attr("preserveAspectRatio", "xMidYMid slice").attr("href", n.photo);
                     }
                 });
 
-                nodeElements.append("circle")
-                    .attr("r", 30)
-                    .attr("fill", d => d.photo ? `url(#img-${d.id})` : "#334155");
+                nodeElements.append("circle").attr("r", 30).attr("fill", d => d.photo ? `url(#img-${d.id})` : "#1e293b");
 
-                nodeElements.append("text")
-                    .attr("dy", 55)
-                    .attr("text-anchor", "middle")
-                    .text(d => d.name)
-                    .attr("fill", "#e2e8f0")
-                    .attr("font-size", "14px")
-                    .attr("font-weight", "500")
-                    .style("pointer-events", "none")
-                    .style("text-shadow", "0 2px 4px rgba(0,0,0,0.9)");
+                nodeElements.append("text").attr("dy", 55).attr("text-anchor", "middle").text(d => d.name)
+                    .attr("fill", "white").attr("font-size", "14px").style("text-shadow", "0 2px 4px black").style("pointer-events", "none");
 
                 nodeElements.on("click", (e, d) => {
                     e.stopPropagation();
                     setSelectedNodeId(d.id);
-                    svg.transition().duration(750).call(
-                        zoom.transform,
-                        d3.zoomIdentity.translate(width/2, height/2).scale(1.2).translate(-d.x, -d.y)
-                    );
+                    svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(width/2, height/2).scale(1.2).translate(-d.x, -d.y));
                 });
 
                 svg.on("click", () => setSelectedNodeId(null));
 
                 simulation.on("tick", () => {
-                    linkElements
-                        .attr("x1", d => d.source.x)
-                        .attr("y1", d => d.source.y)
-                        .attr("x2", d => d.target.x)
-                        .attr("y2", d => d.target.y);
-
+                    linkElements.attr("x1", d => d.source.x).attr("y1", d => d.source.y).attr("x2", d => d.target.x).attr("y2", d => d.target.y);
                     nodeElements.attr("transform", d => `translate(${d.x},${d.y})`);
                 });
 
-            }, [nodes, links, loading]);
+            }, [nodes, links]);
 
             useEffect(() => {
                 if (!simulationRef.current) return;
                 const g = d3.select(svgRef.current).select("g");
-                g.selectAll("g").transition().attr("opacity", d => 
-                    d.name.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0.1
-                );
+                g.selectAll("g").transition().attr("opacity", d => d.name.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0.1);
                 g.selectAll("line").transition().attr("opacity", searchTerm ? 0.05 : 0.6);
             }, [searchTerm]);
 
             const selectedNode = nodes.find(n => n.id === selectedNodeId);
             const nodeLinks = links.filter(l => l.source.id === selectedNodeId);
-
-            // FIX: Use simple string concatenation instead of template literals to avoid parser errors
-            let sidebarClass = "absolute top-0 left-0 h-full w-full sm:w-96 bg-card/95 backdrop-blur-xl shadow-2xl z-20 transition-transform duration-300 transform border-r border-white/10 flex flex-col ";
-            sidebarClass += selectedNode ? "translate-x-0" : "-translate-x-full";
+            
+            const sidebarBase = "absolute top-0 left-0 h-full w-full sm:w-96 bg-card/95 backdrop-blur-xl shadow-2xl z-20 transition-transform duration-300 transform border-r border-white/10 flex flex-col ";
+            const sidebarClass = sidebarBase + (selectedNode ? "translate-x-0" : "-translate-x-full");
 
             return (
-                <div className="w-screen h-screen relative bg-dark">
+                <div className="w-screen h-screen relative bg-dark overflow-hidden">
+                    {/* Debug Console */}
+                    <div className="absolute top-24 left-4 z-50 text-[10px] text-green-400 font-mono bg-black/90 p-4 rounded w-64 h-64 overflow-y-auto border border-green-900 shadow-xl opacity-80 pointer-events-auto">
+                        <div className="font-bold border-b border-green-800 mb-2 pb-1">DEBUG LOG</div>
+                        {logs.map((log, i) => <div key={i} className="mb-1 border-b border-green-900/30 pb-1 last:border-0 break-words">{`> ${log}`}</div>)}
+                    </div>
+
                     <div className="absolute top-0 left-0 right-0 p-4 z-10 flex justify-between pointer-events-none">
                         <div className="pointer-events-auto glass rounded-full px-4 py-3 flex items-center gap-3 shadow-2xl max-w-sm w-full">
                             <span className="text-gray-400"><Icons.Search /></span>
-                            <input 
-                                className="bg-transparent border-none outline-none text-white w-full text-right font-medium"
-                                placeholder="חיפוש אנשים..."
-                                value={searchTerm}
-                                onChange={e => setSearchTerm(e.target.value)}
-                            />
-                            {searchTerm && (
-                                <button onClick={() => setSearchTerm("")} className="text-gray-400 hover:text-white">
-                                    <Icons.X />
-                                </button>
-                            )}
+                            <input className="bg-transparent border-none outline-none text-white w-full text-right font-medium" placeholder="חיפוש אנשים..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                            {searchTerm && <button onClick={() => setSearchTerm("")} className="text-gray-400 hover:text-white"><Icons.X /></button>}
                         </div>
-                        <button onClick={() => window.location.reload()} className="pointer-events-auto glass p-3 rounded-full text-white hover:bg-white/10 transition">
-                            <Icons.Refresh />
-                        </button>
+                        <button onClick={() => window.location.reload()} className="pointer-events-auto glass p-3 rounded-full text-white hover:bg-white/10 transition"><Icons.Refresh /></button>
                     </div>
 
-                    <svg ref={svgRef} className="w-full h-full block cursor-move active:cursor-grabbing"></svg>
+                    <svg ref={svgRef} className="w-full h-full block cursor-move active:cursor-grabbing bg-gray-900/50"></svg>
 
                     <div className={sidebarClass}>
                         {selectedNode && (
                             <React.Fragment>
                                 <div className="h-56 relative bg-gray-900">
-                                    {selectedNode.photo && (
-                                        <img 
-                                            src={selectedNode.photo} 
-                                            className="w-full h-full object-cover opacity-60" 
-                                            onError={(e) => { e.target.style.opacity = '0.2'; }} 
-                                        />
-                                    )}
+                                    {selectedNode.photo && <img src={selectedNode.photo} className="w-full h-full object-cover opacity-60" onError={(e) => { e.target.style.opacity = '0.2'; }} />}
                                     <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent"></div>
-                                    <button onClick={() => setSelectedNodeId(null)} className="absolute top-4 left-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full transition backdrop-blur-sm">
-                                        <Icons.X />
-                                    </button>
+                                    <button onClick={() => setSelectedNodeId(null)} className="absolute top-4 left-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full transition backdrop-blur-sm"><Icons.X /></button>
                                     <div className="absolute bottom-4 right-4 text-right">
                                         <h2 className="text-3xl font-bold text-white mb-1 drop-shadow-lg">{selectedNode.name}</h2>
                                         <div className="flex flex-wrap gap-2 justify-end">
@@ -374,9 +295,7 @@
                                                     <div key={idx} className="bg-white/5 p-4 rounded-xl border border-white/5 hover:border-primary/30 transition group">
                                                         <div className="font-bold text-white mb-1 text-sm">מקושר ל: <span className="text-blue-300">{link.target.name}</span></div>
                                                         <p className="text-xs text-gray-400 mb-3">{link.description}</p>
-                                                        {link.referenceUrl && (
-                                                            <a href={link.referenceUrl} target="_blank" className="inline-flex items-center gap-1 text-xs text-accent hover:text-white transition"><Icons.ExternalLink /> המקור לחיבור</a>
-                                                        )}
+                                                        {link.referenceUrl && <a href={link.referenceUrl} target="_blank" className="inline-flex items-center gap-1 text-xs text-accent hover:text-white transition"><Icons.ExternalLink /> המקור לחיבור</a>}
                                                     </div>
                                                 ))}
                                             </div>
@@ -399,7 +318,6 @@
                             </React.Fragment>
                         )}
                     </div>
-                    {loading && <div className="absolute inset-0 flex items-center justify-center bg-dark text-white z-50"><div className="text-xl animate-pulse">טוען נתונים...</div></div>}
                 </div>
             );
         };
@@ -409,8 +327,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-                                        
