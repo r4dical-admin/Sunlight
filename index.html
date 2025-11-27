@@ -49,6 +49,20 @@
         .custom-scroll::-webkit-scrollbar-track { background: #1e293b; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
         .glass { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        /* Form Styles */
+        .form-input { 
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            color: white; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            width: 100%; 
+            outline: none; 
+            transition: border-color 0.2s;
+        }
+        .form-input:focus { border-color: #3b82f6; }
+        .form-label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; margin-top: 12px; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -59,15 +73,165 @@
 
         // --- CONFIGURATION ---
         const DATA_BASE_URL = "https://r4dical-admin.github.io/Sunlight/people";
+        const REPO_URL = "https://github.com/r4dical-admin/Sunlight";
+        const REPO_ISSUES_URL = "https://github.com/r4dical-admin/Sunlight/issues/new";
 
         const Icons = {
             Search: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>),
-            X: () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>),
+            X: ({size=24}) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>),
             User: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>),
             Link: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>),
             ExternalLink: () => (<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>),
-            Refresh: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>)
+            Refresh: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>),
+            Plus: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>),
+            Send: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>),
+            Github: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>),
+            Terminal: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>)
         };
+
+        // --- Suggestion Form Component ---
+        const SuggestionModal = ({ onClose, existingNodes }) => {
+            const [type, setType] = useState('person'); // 'person' or 'link'
+            
+            // Person Fields
+            const [name, setName] = useState('');
+            const [desc, setDesc] = useState('');
+            const [positions, setPositions] = useState('');
+            const [photo, setPhoto] = useState('');
+            const [linkedin, setLinkedin] = useState('');
+
+            // Link Fields
+            const [sourceId, setSourceId] = useState('');
+            const [targetId, setTargetId] = useState('');
+            const [linkDesc, setLinkDesc] = useState('');
+            const [linkRef, setLinkRef] = useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                
+                let jsonBody = {};
+                let title = "";
+
+                if (type === 'person') {
+                    const newId = (Math.floor(Math.random() * 1000) + 100).toString(); // Suggest a random ID
+                    title = `New Person: ${name}`;
+                    jsonBody = {
+                        id: newId,
+                        name: name,
+                        description: desc,
+                        photo: photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name.replace(/\s/g,'')}`,
+                        positions: positions.split(',').map(p => p.trim()).filter(p => p),
+                        references: linkedin ? [{ title: "LinkedIn", url: linkedin }] : [],
+                        links: []
+                    };
+                } else {
+                    const sourceName = existingNodes.find(n => n.id === sourceId)?.name || sourceId;
+                    const targetName = existingNodes.find(n => n.id === targetId)?.name || targetId;
+                    title = `New Link: ${sourceName} -> ${targetName}`;
+                    jsonBody = {
+                        targetId: targetId,
+                        description: linkDesc,
+                        referenceUrl: linkRef
+                    };
+                }
+
+                const bodyText = `Please add the following JSON to the ${type === 'person' ? 'relevant new file' : 'source person file'}:\n\n\`\`\`json\n${JSON.stringify(jsonBody, null, 2)}\n\`\`\``;
+                
+                const url = `${REPO_ISSUES_URL}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(bodyText)}`;
+                window.open(url, '_blank');
+                onClose();
+            };
+
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 text-right" dir="rtl">
+                    <div className="bg-card border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh]">
+                        {/* Header */}
+                        <div className="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-2xl">
+                            <h2 className="text-lg font-bold text-white flex items-center gap-2"><Icons.Plus /> הצעת שינוי</h2>
+                            <button onClick={onClose} className="text-gray-400 hover:text-white p-1 hover:bg-white/10 rounded-full transition"><Icons.X /></button>
+                        </div>
+                        
+                        <div className="p-6 overflow-y-auto custom-scroll">
+                            <div className="flex bg-black/20 p-1 rounded-lg mb-6">
+                                <button 
+                                    onClick={() => setType('person')}
+                                    className={`flex-1 py-2 rounded-md text-sm font-medium transition ${type === 'person' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    אדם חדש
+                                </button>
+                                <button 
+                                    onClick={() => setType('link')}
+                                    className={`flex-1 py-2 rounded-md text-sm font-medium transition ${type === 'link' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    קשר חדש
+                                </button>
+                            </div>
+
+                            <form id="suggestForm" onSubmit={handleSubmit}>
+                                {type === 'person' ? (
+                                    <>
+                                        <div>
+                                            <label className="form-label">שם מלא</label>
+                                            <input required className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="ישראל ישראלי" />
+                                        </div>
+                                        <div>
+                                            <label className="form-label">תיאור קצר</label>
+                                            <textarea required className="form-input h-24" value={desc} onChange={e => setDesc(e.target.value)} placeholder="פסקה קצרה על האדם..." />
+                                        </div>
+                                        <div>
+                                            <label className="form-label">תפקידים (מופרד בפסיקים)</label>
+                                            <input className="form-input" value={positions} onChange={e => setPositions(e.target.value)} placeholder="מנכ״ל, יזם, מפתח" />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="form-label">קישור לתמונה (אופציונלי)</label>
+                                                <input className="form-input" value={photo} onChange={e => setPhoto(e.target.value)} placeholder="https://..." />
+                                            </div>
+                                            <div>
+                                                <label className="form-label">לינקדאין (אופציונלי)</label>
+                                                <input className="form-input" value={linkedin} onChange={e => setLinkedin(e.target.value)} placeholder="https://linkedin.com/..." />
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div>
+                                            <label className="form-label">מקור (מי האדם המקשר?)</label>
+                                            <select required className="form-input" value={sourceId} onChange={e => setSourceId(e.target.value)}>
+                                                <option value="">בחר אדם...</option>
+                                                {existingNodes.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="form-label">יעד (למי הוא מקושר?)</label>
+                                            <select required className="form-input" value={targetId} onChange={e => setTargetId(e.target.value)}>
+                                                <option value="">בחר אדם...</option>
+                                                {existingNodes.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="form-label">תיאור הקשר</label>
+                                            <input required className="form-input" value={linkDesc} onChange={e => setLinkDesc(e.target.value)} placeholder="למשל: עבדו יחד בגוגל" />
+                                        </div>
+                                        <div>
+                                            <label className="form-label">סימוכין לקשר (URL)</label>
+                                            <input className="form-input" value={linkRef} onChange={e => setLinkRef(e.target.value)} placeholder="https://..." />
+                                        </div>
+                                    </>
+                                )}
+                            </form>
+                        </div>
+
+                        <div className="p-4 border-t border-white/10 bg-white/5 rounded-b-2xl">
+                            <button type="submit" form="suggestForm" className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-green-900/20">
+                                <Icons.Send /> שלח הצעה ל-GitHub
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
 
         const App = () => {
             const [nodes, setNodes] = useState([]);
@@ -75,7 +239,9 @@
             const [loading, setLoading] = useState(true);
             const [searchTerm, setSearchTerm] = useState("");
             const [selectedNodeId, setSelectedNodeId] = useState(null);
-            const [logs, setLogs] = useState([]); 
+            const [logs, setLogs] = useState([]);
+            const [showDebug, setShowDebug] = useState(false);
+            const [isModalOpen, setIsModalOpen] = useState(false);
             
             const svgRef = useRef(null);
             const simulationRef = useRef(null);
@@ -249,11 +415,17 @@
 
             return (
                 <div className="w-screen h-screen relative bg-dark overflow-hidden">
+                    {/* Suggestion Modal */}
+                    {isModalOpen && <SuggestionModal onClose={() => setIsModalOpen(false)} existingNodes={nodes} />}
+
                     {/* Debug Console */}
-                    <div className="absolute top-24 left-4 z-50 text-[10px] text-green-400 font-mono bg-black/90 p-4 rounded w-64 h-64 overflow-y-auto border border-green-900 shadow-xl opacity-80 pointer-events-auto">
-                        <div className="font-bold border-b border-green-800 mb-2 pb-1">DEBUG LOG</div>
-                        {logs.map((log, i) => <div key={i} className="mb-1 border-b border-green-900/30 pb-1 last:border-0 break-words">{`> ${log}`}</div>)}
-                    </div>
+                    {showDebug && (
+                        <div className="absolute top-24 left-4 z-50 text-[10px] text-green-400 font-mono bg-black/90 p-4 rounded w-64 h-64 overflow-y-auto border border-green-900 shadow-xl opacity-80 pointer-events-auto">
+                            <button onClick={() => setShowDebug(false)} className="absolute top-2 right-2 text-green-600 hover:text-green-300"><Icons.X size={14} /></button>
+                            <div className="font-bold border-b border-green-800 mb-2 pb-1 mr-4">DEBUG LOG</div>
+                            {logs.map((log, i) => <div key={i} className="mb-1 border-b border-green-900/30 pb-1 last:border-0 break-words">{`> ${log}`}</div>)}
+                        </div>
+                    )}
 
                     <div className="absolute top-0 left-0 right-0 p-4 z-10 flex justify-between pointer-events-none">
                         <div className="pointer-events-auto glass rounded-full px-4 py-3 flex items-center gap-3 shadow-2xl max-w-sm w-full">
@@ -261,7 +433,21 @@
                             <input className="bg-transparent border-none outline-none text-white w-full text-right font-medium" placeholder="חיפוש אנשים..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
                             {searchTerm && <button onClick={() => setSearchTerm("")} className="text-gray-400 hover:text-white"><Icons.X /></button>}
                         </div>
-                        <button onClick={() => window.location.reload()} className="pointer-events-auto glass p-3 rounded-full text-white hover:bg-white/10 transition"><Icons.Refresh /></button>
+                        
+                        <div className="flex gap-2 pointer-events-auto">
+                             <a href={REPO_URL} target="_blank" className="glass p-3 rounded-full text-white hover:bg-white/10 transition" title="GitHub Repo">
+                                <Icons.Github />
+                            </a>
+                             <button onClick={() => setShowDebug(true)} className={`glass p-3 rounded-full text-white hover:bg-white/10 transition ${showDebug ? 'text-green-400' : ''}`} title="Debug Console">
+                                <Icons.Terminal />
+                            </button>
+                             <button onClick={() => setIsModalOpen(true)} className="glass p-3 rounded-full text-white hover:bg-white/10 transition bg-green-600/50 hover:bg-green-600" title="הצע שינוי">
+                                <Icons.Plus />
+                            </button>
+                            <button onClick={() => window.location.reload()} className="glass p-3 rounded-full text-white hover:bg-white/10 transition">
+                                <Icons.Refresh />
+                            </button>
+                        </div>
                     </div>
 
                     <svg ref={svgRef} className="w-full h-full block cursor-move active:cursor-grabbing bg-gray-900/50"></svg>
