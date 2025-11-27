@@ -1,0 +1,18 @@
+{
+  "id": "3",
+  "name": "דוד גולדברג",
+  "description": "יזם סדרתי ומשקיע המתמקד בטכנולוגיות אקלים (Climate Tech). דוד כיהן בעבר כמנכ\"ל של מספר חברות הזנק מצליחות.",
+  "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
+  "positions": [
+    "שותף בקרן הון סיכון",
+    "מנכ״ל לשעבר"
+  ],
+  "references": [],
+  "links": [
+    {
+      "targetId": "1",
+      "description": "שותף עסקי בפרויקט הגדול",
+      "referenceUrl": "https://crunchbase.com"
+    }
+  ]
+}
