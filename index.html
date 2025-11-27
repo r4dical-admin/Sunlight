@@ -309,7 +309,9 @@
             const selectedNode = nodes.find(n => n.id === selectedNodeId);
             const nodeLinks = links.filter(l => l.source.id === selectedNodeId);
 
-            const sidebarClass = `absolute top-0 left-0 h-full w-full sm:w-96 bg-card/95 backdrop-blur-xl shadow-2xl z-20 transition-transform duration-300 transform border-r border-white/10 flex flex-col ${selectedNode ? 'translate-x-0' : '-translate-x-full'}`;
+            // FIX: Use simple string concatenation instead of template literals to avoid parser errors
+            let sidebarClass = "absolute top-0 left-0 h-full w-full sm:w-96 bg-card/95 backdrop-blur-xl shadow-2xl z-20 transition-transform duration-300 transform border-r border-white/10 flex flex-col ";
+            sidebarClass += selectedNode ? "translate-x-0" : "-translate-x-full";
 
             return (
                 <div className="w-screen h-screen relative bg-dark">
@@ -382,4 +384,33 @@
                                     )}
                                     {selectedNode.references && selectedNode.references.length > 0 && (
                                         <section>
-                                            <h3 className="text-primary text-xs font-bol
+                                            <h3 className="text-primary text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2"><Icons.ExternalLink /> מקורות נוספים</h3>
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {selectedNode.references.map((ref, i) => (
+                                                    <a key={i} href={ref.url} target="_blank" className="block bg-white/5 px-4 py-3 rounded-lg text-sm text-gray-300 hover:bg-white/10 hover:text-white transition flex justify-between items-center group">
+                                                        <span>{ref.title}</span>
+                                                        <span className="opacity-0 group-hover:opacity-100 transition-opacity"><Icons.ExternalLink /></span>
+                                                    </a>
+                                                ))}
+                                            </div>
+                                        </section>
+                                    )}
+                                </div>
+                            </React.Fragment>
+                        )}
+                    </div>
+                    {loading && <div className="absolute inset-0 flex items-center justify-center bg-dark text-white z-50"><div className="text-xl animate-pulse">טוען נתונים...</div></div>}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
+
+
+
+                                        
