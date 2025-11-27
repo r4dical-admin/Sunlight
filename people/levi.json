@@ -1,0 +1,23 @@
+{
+  "id": "2",
+  "name": "מיכל לוי",
+  "description": "חוקרת נתונים ומומחית AI. מיכל מתמחה בלמידת מכונה ומרצה בכנסים בינלאומיים בנושאי אתיקה בבינה מלאכותית.",
+  "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Michal",
+  "positions": [
+    "חוקרת בטכניון",
+    "Data Scientist במיקרוסופט"
+  ],
+  "references": [
+    {
+      "title": "מאמר אקדמי",
+      "url": "https://scholar.google.com"
+    }
+  ],
+  "links": [
+    {
+      "targetId": "3",
+      "description": "מנטורית בתוכנית המצוינות",
+      "referenceUrl": "https://technion.ac.il"
+    }
+  ]
+}
