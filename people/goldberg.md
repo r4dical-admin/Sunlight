@@ -9,7 +9,8 @@ links:
 - targetId: "1"
   - desc: "שותף עסקי בפרויקט הגדול"
   - referenceUrl: "#"
-references: []
+references:
+ - #
 ---
 
 יזם סדרתי ומשקיע המתמקד בטכנולוגיות אקלים (Climate Tech).
