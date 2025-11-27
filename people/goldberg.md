@@ -1,3 +1,4 @@
+---
 id: "3"
 name: "דוד גולדברג"
 photo: "https://www.google.com/search?q=https://api.dicebear.com/7.x/avataaars/svg%3Fseed%3DDavid"
@@ -9,5 +10,6 @@ positions:
    desc: "שותף עסקי בפרויקט הגדול"
    referenceUrl: "https://crunchbase.com"
    references: []
+---
 יזם סדרתי ומשקיע המתמקד בטכנולוגיות אקלים (Climate Tech).
 דוד כיהן בעבר כמנכ"ל של מספר חברות הזנק מצליחות וכיום מלווה יזמים צעירים בצעדיהם הראשונים בעולם ההייטק.
