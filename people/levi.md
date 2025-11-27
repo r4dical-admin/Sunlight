@@ -4,7 +4,7 @@ name: "מיכל לוי"
 photo: "https://www.google.com/search?q=https://api.dicebear.com/7.x/avataaars/svg%3Fseed%3DMichal"
 positions:
 - ​"חוקרת בטכניון"
-​"Data Scientist במיקרוסופט"
+- ​"Data Scientist במיקרוסופט"
 links:
 ​targetId: "3"
 desc: "מנטורית בתוכנית המצוינות"
