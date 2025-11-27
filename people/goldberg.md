@@ -6,9 +6,9 @@ positions:
 - "שותף בקרן הון סיכון"
 - "מנכ״ל לשעבר"
 links:
-- targetId: "1"
-  - desc: "שותף עסקי בפרויקט הגדול"
-  - referenceUrl: "#"
+targetId: "1"
+desc: "שותף עסקי בפרויקט הגדול"
+referenceUrl: "#"
 references:
  - #
 ---
