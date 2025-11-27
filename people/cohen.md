@@ -14,4 +14,4 @@ references:
     url: "https://linkedin.com"
 ---
 Israel is a senior developer specializing in distributed systems. 
-He is an enthusiastic activist in the open source community in Israel.
+He is an enthusiastic activist in the open source community in Israel. 
