@@ -1,0 +1,24 @@
+{
+  "id": "unique-id",
+  "name": "Full Name",
+  "updatedAt": "2023-10-27",
+  "description": "Short bio with #tags like #developer or #activist.",
+  "photo": "https://...",
+  "positions": [
+    "Role @ Company"
+  ],
+  "references": [
+    {
+      "title": "LinkedIn",
+      "url": "https://linkedin.com/in/..."
+    }
+  ],
+  "links": [
+    {
+      "targetId": "other-id",
+      "updatedAt": "2023-10-27",
+      "description": "Connection description",
+      "referenceUrl": "https://..."
+    }
+  ]
+}
