@@ -36,7 +36,8 @@
                         dark: '#0f172a',
                         card: '#1e293b',
                         primary: '#3b82f6',
-                        accent: '#f43f5e'
+                        accent: '#f43f5e',
+                        tag: '#10b981'
                     }
                 }
             }
@@ -76,6 +77,29 @@
         const REPO_URL = "https://github.com/r4dical-admin/Sunlight";
         const REPO_ISSUES_URL = "https://github.com/r4dical-admin/Sunlight/issues/new";
 
+        // --- HELPERS ---
+        const trackEvent = (eventName, params = {}) => {
+            if (window.gtag) {
+                window.gtag('event', eventName, params);
+            }
+            console.log(`[Analytics] ${eventName}`, params);
+        };
+
+        const formatDate = (dateString) => {
+            if (!dateString) return null;
+            try {
+                return new Date(dateString).toLocaleDateString('he-IL');
+            } catch (e) { return null; }
+        };
+
+        // Regex for hashtags (Supports Hebrew & English)
+        const extractTags = (text) => {
+            if (!text) return [];
+            // Matches # followed by word characters or Hebrew characters
+            const matches = text.match(/#[a-zA-Z0-9\u0590-\u05FF_]+/g);
+            return matches ? matches : [];
+        };
+
         const Icons = {
             Search: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>),
             X: ({size=24}) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>),
@@ -86,21 +110,17 @@
             Plus: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>),
             Send: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>),
             Github: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>),
-            Terminal: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>)
+            Terminal: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>),
+            Calendar: () => (<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>)
         };
 
-        // --- Suggestion Form Component ---
         const SuggestionModal = ({ onClose, existingNodes }) => {
-            const [type, setType] = useState('person'); // 'person' or 'link'
-            
-            // Person Fields
+            const [type, setType] = useState('person'); 
             const [name, setName] = useState('');
             const [desc, setDesc] = useState('');
             const [positions, setPositions] = useState('');
             const [photo, setPhoto] = useState('');
             const [linkedin, setLinkedin] = useState('');
-
-            // Link Fields
             const [sourceId, setSourceId] = useState('');
             const [targetId, setTargetId] = useState('');
             const [linkDesc, setLinkDesc] = useState('');
@@ -108,16 +128,19 @@
 
             const handleSubmit = (e) => {
                 e.preventDefault();
-                
+                trackEvent('submit_suggestion', { type: type });
+
                 let jsonBody = {};
                 let title = "";
+                const today = new Date().toISOString().split('T')[0];
 
                 if (type === 'person') {
-                    const newId = (Math.floor(Math.random() * 1000) + 100).toString(); // Suggest a random ID
+                    const newId = (Math.floor(Math.random() * 1000) + 100).toString(); 
                     title = `New Person: ${name}`;
                     jsonBody = {
                         id: newId,
                         name: name,
+                        updatedAt: today,
                         description: desc,
                         photo: photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name.replace(/\s/g,'')}`,
                         positions: positions.split(',').map(p => p.trim()).filter(p => p),
@@ -130,13 +153,13 @@
                     title = `New Link: ${sourceName} -> ${targetName}`;
                     jsonBody = {
                         targetId: targetId,
+                        updatedAt: today,
                         description: linkDesc,
                         referenceUrl: linkRef
                     };
                 }
 
                 const bodyText = `Please add the following JSON to the ${type === 'person' ? 'relevant new file' : 'source person file'}:\n\n\`\`\`json\n${JSON.stringify(jsonBody, null, 2)}\n\`\`\``;
-                
                 const url = `${REPO_ISSUES_URL}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(bodyText)}`;
                 window.open(url, '_blank');
                 onClose();
@@ -145,93 +168,43 @@
             return (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 text-right" dir="rtl">
                     <div className="bg-card border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh]">
-                        {/* Header */}
                         <div className="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-2xl">
                             <h2 className="text-lg font-bold text-white flex items-center gap-2"><Icons.Plus /> הצעת שינוי</h2>
                             <button onClick={onClose} className="text-gray-400 hover:text-white p-1 hover:bg-white/10 rounded-full transition"><Icons.X /></button>
                         </div>
-                        
                         <div className="p-6 overflow-y-auto custom-scroll">
                             <div className="flex bg-black/20 p-1 rounded-lg mb-6">
-                                <button 
-                                    onClick={() => setType('person')}
-                                    className={`flex-1 py-2 rounded-md text-sm font-medium transition ${type === 'person' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'}`}
-                                >
-                                    אדם חדש
-                                </button>
-                                <button 
-                                    onClick={() => setType('link')}
-                                    className={`flex-1 py-2 rounded-md text-sm font-medium transition ${type === 'link' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'}`}
-                                >
-                                    קשר חדש
-                                </button>
+                                <button onClick={() => setType('person')} className={`flex-1 py-2 rounded-md text-sm font-medium transition ${type === 'person' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'}`}>אדם חדש</button>
+                                <button onClick={() => setType('link')} className={`flex-1 py-2 rounded-md text-sm font-medium transition ${type === 'link' ? 'bg-primary text-white shadow' : 'text-gray-400 hover:text-white'}`}>קשר חדש</button>
                             </div>
-
                             <form id="suggestForm" onSubmit={handleSubmit}>
                                 {type === 'person' ? (
                                     <>
-                                        <div>
-                                            <label className="form-label">שם מלא</label>
-                                            <input required className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="ישראל ישראלי" />
-                                        </div>
-                                        <div>
-                                            <label className="form-label">תיאור קצר</label>
-                                            <textarea required className="form-input h-24" value={desc} onChange={e => setDesc(e.target.value)} placeholder="פסקה קצרה על האדם..." />
-                                        </div>
-                                        <div>
-                                            <label className="form-label">תפקידים (מופרד בפסיקים)</label>
-                                            <input className="form-input" value={positions} onChange={e => setPositions(e.target.value)} placeholder="מנכ״ל, יזם, מפתח" />
-                                        </div>
+                                        <div><label className="form-label">שם מלא</label><input required className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="ישראל ישראלי" /></div>
+                                        <div><label className="form-label">תיאור קצר (ניתן להוסיף #תגיות)</label><textarea required className="form-input h-24" value={desc} onChange={e => setDesc(e.target.value)} placeholder="פסקה קצרה... #מתכנת #יזם" /></div>
+                                        <div><label className="form-label">תפקידים</label><input className="form-input" value={positions} onChange={e => setPositions(e.target.value)} placeholder="מנכ״ל, יזם, מפתח" /></div>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="form-label">קישור לתמונה (אופציונלי)</label>
-                                                <input className="form-input" value={photo} onChange={e => setPhoto(e.target.value)} placeholder="https://..." />
-                                            </div>
-                                            <div>
-                                                <label className="form-label">לינקדאין (אופציונלי)</label>
-                                                <input className="form-input" value={linkedin} onChange={e => setLinkedin(e.target.value)} placeholder="https://linkedin.com/..." />
-                                            </div>
+                                            <div><label className="form-label">תמונה (URL)</label><input className="form-input" value={photo} onChange={e => setPhoto(e.target.value)} placeholder="https://..." /></div>
+                                            <div><label className="form-label">לינקדאין</label><input className="form-input" value={linkedin} onChange={e => setLinkedin(e.target.value)} placeholder="https://linkedin.com/..." /></div>
                                         </div>
                                     </>
                                 ) : (
                                     <>
-                                        <div>
-                                            <label className="form-label">מקור (מי האדם המקשר?)</label>
-                                            <select required className="form-input" value={sourceId} onChange={e => setSourceId(e.target.value)}>
-                                                <option value="">בחר אדם...</option>
-                                                {existingNodes.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="form-label">יעד (למי הוא מקושר?)</label>
-                                            <select required className="form-input" value={targetId} onChange={e => setTargetId(e.target.value)}>
-                                                <option value="">בחר אדם...</option>
-                                                {existingNodes.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="form-label">תיאור הקשר</label>
-                                            <input required className="form-input" value={linkDesc} onChange={e => setLinkDesc(e.target.value)} placeholder="למשל: עבדו יחד בגוגל" />
-                                        </div>
-                                        <div>
-                                            <label className="form-label">סימוכין לקשר (URL)</label>
-                                            <input className="form-input" value={linkRef} onChange={e => setLinkRef(e.target.value)} placeholder="https://..." />
-                                        </div>
+                                        <div><label className="form-label">מקור</label><select required className="form-input" value={sourceId} onChange={e => setSourceId(e.target.value)}><option value="">בחר...</option>{existingNodes.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}</select></div>
+                                        <div><label className="form-label">יעד</label><select required className="form-input" value={targetId} onChange={e => setTargetId(e.target.value)}><option value="">בחר...</option>{existingNodes.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}</select></div>
+                                        <div><label className="form-label">תיאור הקשר</label><input required className="form-input" value={linkDesc} onChange={e => setLinkDesc(e.target.value)} placeholder="למשל: עבדו יחד" /></div>
+                                        <div><label className="form-label">סימוכין (URL)</label><input className="form-input" value={linkRef} onChange={e => setLinkRef(e.target.value)} placeholder="https://..." /></div>
                                     </>
                                 )}
                             </form>
                         </div>
-
                         <div className="p-4 border-t border-white/10 bg-white/5 rounded-b-2xl">
-                            <button type="submit" form="suggestForm" className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-green-900/20">
-                                <Icons.Send /> שלח הצעה ל-GitHub
-                            </button>
+                            <button type="submit" form="suggestForm" className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-green-900/20"><Icons.Send /> שלח הצעה ל-GitHub</button>
                         </div>
                     </div>
                 </div>
             );
         };
-
 
         const App = () => {
             const [nodes, setNodes] = useState([]);
@@ -282,10 +255,7 @@
                                 addLog(`Failed to fetch ${filename}: ${res.status}`);
                                 continue;
                             }
-                            
-                            // Pure JSON parsing
                             const data = await res.json();
-
                             if (data && data.id) {
                                 loadedIds.add(data.id);
                                 newNodes.push({ ...data, x: Math.random() * 800, y: Math.random() * 600 });
@@ -306,6 +276,7 @@
                                     newLinks.push({
                                         source: node.id,
                                         target: link.targetId,
+                                        updatedAt: link.updatedAt,
                                         description: link.description || link.desc,
                                         referenceUrl: link.referenceUrl
                                     });
@@ -322,10 +293,8 @@
                     } else {
                         addLog("CRITICAL: No valid nodes found.");
                     }
-                    
                     setLoading(false);
                 };
-                
                 load();
             }, []);
 
@@ -400,16 +369,46 @@
 
             }, [nodes, links]);
 
+            // Enhanced Filter Logic: Name OR Tag
             useEffect(() => {
                 if (!simulationRef.current) return;
                 const g = d3.select(svgRef.current).select("g");
-                g.selectAll("g").transition().attr("opacity", d => d.name.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0.1);
+                const term = searchTerm.toLowerCase();
+
+                g.selectAll("g").transition().attr("opacity", d => {
+                    if (!term) return 1;
+                    const nameMatch = d.name.toLowerCase().includes(term);
+                    const tags = extractTags(d.description);
+                    const tagMatch = tags.some(t => t.toLowerCase().includes(term));
+                    return (nameMatch || tagMatch) ? 1 : 0.1;
+                });
+                
                 g.selectAll("line").transition().attr("opacity", searchTerm ? 0.05 : 0.6);
             }, [searchTerm]);
 
             const selectedNode = nodes.find(n => n.id === selectedNodeId);
             const nodeLinks = links.filter(l => l.source.id === selectedNodeId);
             
+            // Description Rendering with Clickable Tags
+            const renderDescription = (text) => {
+                if (!text) return null;
+                const parts = text.split(/(#[a-zA-Z0-9\u0590-\u05FF_]+)/g);
+                return parts.map((part, i) => {
+                    if (part.startsWith('#')) {
+                        return (
+                            <span 
+                                key={i} 
+                                onClick={() => setSearchTerm(part)}
+                                className="text-tag font-medium cursor-pointer hover:underline mx-0.5"
+                            >
+                                {part}
+                            </span>
+                        );
+                    }
+                    return part;
+                });
+            };
+
             const sidebarBase = "absolute top-0 left-0 h-full w-full sm:w-96 bg-card/95 backdrop-blur-xl shadow-2xl z-20 transition-transform duration-300 transform border-r border-white/10 flex flex-col ";
             const sidebarClass = sidebarBase + (selectedNode ? "translate-x-0" : "-translate-x-full");
 
@@ -430,18 +429,18 @@
                     <div className="absolute top-0 left-0 right-0 p-4 z-10 flex justify-between pointer-events-none">
                         <div className="pointer-events-auto glass rounded-full px-4 py-3 flex items-center gap-3 shadow-2xl max-w-sm w-full">
                             <span className="text-gray-400"><Icons.Search /></span>
-                            <input className="bg-transparent border-none outline-none text-white w-full text-right font-medium" placeholder="חיפוש אנשים..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                            <input className="bg-transparent border-none outline-none text-white w-full text-right font-medium" placeholder="חיפוש (שם או #תגית)..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
                             {searchTerm && <button onClick={() => setSearchTerm("")} className="text-gray-400 hover:text-white"><Icons.X /></button>}
                         </div>
                         
                         <div className="flex gap-2 pointer-events-auto">
-                             <a href={REPO_URL} target="_blank" className="glass p-3 rounded-full text-white hover:bg-white/10 transition" title="GitHub Repo">
+                             <a href={REPO_URL} target="_blank" onClick={() => trackEvent('github_click')} className="glass p-3 rounded-full text-white hover:bg-white/10 transition" title="GitHub Repo">
                                 <Icons.Github />
                             </a>
                              <button onClick={() => setShowDebug(true)} className={`glass p-3 rounded-full text-white hover:bg-white/10 transition ${showDebug ? 'text-green-400' : ''}`} title="Debug Console">
                                 <Icons.Terminal />
                             </button>
-                             <button onClick={() => setIsModalOpen(true)} className="glass p-3 rounded-full text-white hover:bg-white/10 transition bg-green-600/50 hover:bg-green-600" title="הצע שינוי">
+                             <button onClick={() => { setIsModalOpen(true); trackEvent('begin_suggestion'); }} className="glass p-3 rounded-full text-white hover:bg-white/10 transition bg-green-600/50 hover:bg-green-600" title="הצע שינוי">
                                 <Icons.Plus />
                             </button>
                             <button onClick={() => window.location.reload()} className="glass p-3 rounded-full text-white hover:bg-white/10 transition">
@@ -459,19 +458,26 @@
                                     {selectedNode.photo && <img src={selectedNode.photo} className="w-full h-full object-cover opacity-60" onError={(e) => { e.target.style.opacity = '0.2'; }} />}
                                     <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent"></div>
                                     <button onClick={() => setSelectedNodeId(null)} className="absolute top-4 left-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full transition backdrop-blur-sm"><Icons.X /></button>
-                                    <div className="absolute bottom-4 right-4 text-right">
+                                    <div className="absolute bottom-4 right-4 text-right px-4">
                                         <h2 className="text-3xl font-bold text-white mb-1 drop-shadow-lg">{selectedNode.name}</h2>
-                                        <div className="flex flex-wrap gap-2 justify-end">
+                                        <div className="flex flex-wrap gap-2 justify-end mb-1">
                                             {selectedNode.positions && selectedNode.positions.slice(0, 2).map((p, i) => (
                                                 <span key={i} className="text-xs bg-primary/20 text-blue-200 px-2 py-0.5 rounded border border-primary/20 backdrop-blur-md">{p}</span>
                                             ))}
                                         </div>
+                                        {selectedNode.updatedAt && (
+                                            <div className="text-[10px] text-gray-400 flex items-center justify-end gap-1 opacity-80">
+                                                 עודכן: {formatDate(selectedNode.updatedAt)} <Icons.Calendar />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="flex-1 overflow-y-auto custom-scroll p-6 text-right space-y-8" dir="rtl">
                                     <section>
                                         <h3 className="text-primary text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2"><Icons.User /> אודות</h3>
-                                        <div className="text-gray-300 leading-relaxed text-sm whitespace-pre-wrap">{selectedNode.description}</div>
+                                        <div className="text-gray-300 leading-relaxed text-sm whitespace-pre-wrap">
+                                            {renderDescription(selectedNode.description)}
+                                        </div>
                                     </section>
                                     {nodeLinks.length > 0 && (
                                         <section>
@@ -479,7 +485,10 @@
                                             <div className="space-y-3">
                                                 {nodeLinks.map((link, idx) => (
                                                     <div key={idx} className="bg-white/5 p-4 rounded-xl border border-white/5 hover:border-primary/30 transition group">
-                                                        <div className="font-bold text-white mb-1 text-sm">מקושר ל: <span className="text-blue-300">{link.target.name}</span></div>
+                                                        <div className="flex justify-between items-start mb-1">
+                                                            <div className="font-bold text-white text-sm">מקושר ל: <span className="text-blue-300">{link.target.name}</span></div>
+                                                            {link.updatedAt && <span className="text-[10px] text-gray-500">{formatDate(link.updatedAt)}</span>}
+                                                        </div>
                                                         <p className="text-xs text-gray-400 mb-3">{link.description}</p>
                                                         {link.referenceUrl && <a href={link.referenceUrl} target="_blank" className="inline-flex items-center gap-1 text-xs text-accent hover:text-white transition"><Icons.ExternalLink /> המקור לחיבור</a>}
                                                     </div>
