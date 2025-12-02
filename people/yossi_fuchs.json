@@ -1,0 +1,18 @@
+{
+  "id": "13",
+  "name": "Yossi Fuchs",
+  "updatedAt": "2025-11-30",
+  "description": "Cabinet Secretary responsible for the government agenda and liaison with the Knesset. A lawyer by trade. #secretary #lawyer #government #politics",
+  "photo": "",
+  "positions": [
+    "Cabinet Secretary"
+  ],
+  "links": [
+    {
+      "targetId": "benjamin_netanyahu",
+      "updatedAt": "2025-11-30",
+      "description": "Cabinet Secretary",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Cabinet_Secretary_(Israel)"
+    }
+  ]
+}
