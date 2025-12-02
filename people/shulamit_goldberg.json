@@ -1,0 +1,19 @@
+{
+  "id": "shulamit_goldberg",
+  "name": "Shulamit Goldberg",
+  "updatedAt": "2025-11-30",
+  "description": "Organizational consultant and group facilitator. Educator in Kiryat Arba. Holds an MA in Jewish Thought. #education #consulting #content",
+  "photo": "",
+  "positions": [
+    "Content Team",
+    "Facebook Team"
+  ],
+  "links": [
+    {
+      "targetId": "shovrot_shivyon",
+      "updatedAt": "2025-11-30",
+      "description": "Team Page",
+      "referenceUrl": "https://shovrot.com/%D7%94%D7%A6%D7%95%D7%95%D7%AA/"
+    }
+  ]
+}
