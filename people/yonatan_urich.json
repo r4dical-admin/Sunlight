@@ -1,0 +1,19 @@
+{
+  "id": "117",
+  "name": "Yonatan Urich",
+  "updatedAt": "2025-11-30",
+  "description": "Strategic media advisor and Likud spokesperson. Key figure in political campaigns and digital strategy. #strategy #media #digital #likud #Qatargate",
+  "photo": "",
+  "positions": [
+    "Strategic Advisor",
+    "Likud Spokesperson"
+  ],
+  "links": [
+    {
+      "targetId": "benjamin_netanyahu",
+      "updatedAt": "2025-11-30",
+      "description": "Strategic Advisor",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Jonatan_Urich"
+    }
+  ]
+}
