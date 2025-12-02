@@ -1,0 +1,19 @@
+{
+  "id": "adi_ben_yishai",
+  "name": "Adi Ben Yishai",
+  "updatedAt": "2025-11-30",
+  "description": "Content and Facebook page manager. Bezalel graduate with a background in Oral Law and Jewish Thought. Publicist and lecturer on femininity. #content #facebook #writer #lecturer",
+  "photo": "",
+  "positions": [
+    "Content Manager",
+    "Facebook Page Manager"
+  ],
+  "links": [
+    {
+      "targetId": "shovrot_shivyon",
+      "updatedAt": "2025-11-30",
+      "description": "Team Page",
+      "referenceUrl": "https://shovrot.com/%D7%94%D7%A6%D7%95%D7%95%D7%AA/"
+    }
+  ]
+}
