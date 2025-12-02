@@ -1,0 +1,50 @@
+{
+  "id": "benjamin_netanyahu",
+  "name": "Benjamin Netanyahu",
+  "updatedAt": "2025-11-30",
+  "description": "Prime Minister of Israel and Chairman of the Likud party. Israel's longest-serving leader. Previously served in the Sayeret Matkal elite unit and as Ambassador to the UN. #PrimeMinister #Likud #Israel #Leader #Bibi",
+  "photo": "",
+  "positions": [
+    "Prime Minister of Israel",
+    "Chairman of the Likud Party",
+    "Member of Knesset"
+  ],
+  "links": [
+    {
+      "targetId": "tzachi_braverman",
+      "updatedAt": "2025-11-30",
+      "description": "Chief of Staff",
+      "referenceUrl": "https://www.timesofisrael.com/cabinet-approves-netanyahus-chief-of-staff-braverman-as-next-envoy-to-uk/"
+    },
+    {
+      "targetId": "ron_dermer",
+      "updatedAt": "2025-11-30",
+      "description": "Minister of Strategic Affairs & Close Confidant",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Ron_Dermer"
+    },
+    {
+      "targetId": "gil_reich",
+      "updatedAt": "2025-11-30",
+      "description": "Acting National Security Advisor",
+      "referenceUrl": "https://www.gov.il/en/departments/news/spoke-pm211025"
+    },
+    {
+      "targetId": "roman_gofman",
+      "updatedAt": "2025-11-30",
+      "description": "Military Secretary",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Military_Secretary_to_the_Prime_Minister"
+    },
+    {
+      "targetId": "yossi_fuchs",
+      "updatedAt": "2025-11-30",
+      "description": "Cabinet Secretary",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Cabinet_Secretary_(Israel)"
+    },
+    {
+      "targetId": "avi_simhon",
+      "updatedAt": "2025-11-30",
+      "description": "Head of National Economic Council",
+      "referenceUrl": "https://www.gov.il/en/departments/units/pmo_general_director"
+    }
+  ]
+}
