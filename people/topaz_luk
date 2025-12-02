@@ -1,0 +1,19 @@
+{
+  "id": "16",
+  "name": "Topaz Luk",
+  "updatedAt": "2025-11-30",
+  "description": "Senior advisor managing foreign relations and media strategy for the Likud party and the Prime Minister. #media #advisor #likud #communications",
+  "photo": "",
+  "positions": [
+    "Senior Advisor",
+    "Spokesperson"
+  ],
+  "links": [
+    {
+      "targetId": "benjamin_netanyahu",
+      "updatedAt": "2025-11-30",
+      "description": "Senior Media Advisor",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Topaz_Luk"
+    }
+  ]
+}
