@@ -1,0 +1,19 @@
+{
+  "id": "tzachi_braverman",
+  "name": "Tzachi Braverman",
+  "updatedAt": "2025-11-30",
+  "description": "Long-time confidant and Chief of Staff to the Prime Minister. Tapped to serve as Ambassador to the UK in late 2025. #chiefofstaff #diplomat #likud #advisor",
+  "photo": "",
+  "positions": [
+    "Chief of Staff to the Prime Minister",
+    "Ambassador-designate to the UK"
+  ],
+  "links": [
+    {
+      "targetId": "benjamin_netanyahu",
+      "updatedAt": "2025-11-30",
+      "description": "Chief of Staff",
+      "referenceUrl": "https://www.timesofisrael.com/cabinet-approves-netanyahus-chief-of-staff-braverman-as-next-envoy-to-uk/"
+    }
+  ]
+}
