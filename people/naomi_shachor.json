@@ -1,0 +1,18 @@
+{
+  "id": "naomi_shachor",
+  "name": "Rabbanit Dr. Naomi Shachor",
+  "updatedAt": "2025-11-30",
+  "description": "Member of the Message Accuracy Team. Lecturer in Bible and History at Orot Israel College. Mother of 10 and grandmother. #education #bible #history #advisor",
+  "photo": "",
+  "positions": [
+    "Message Accuracy Team"
+  ],
+  "links": [
+    {
+      "targetId": "shovrot_shivyon",
+      "updatedAt": "2025-11-30",
+      "description": "Team Page",
+      "referenceUrl": "https://shovrot.com/%D7%94%D7%A6%D7%95%D7%95%D7%AA/"
+    }
+  ]
+}
