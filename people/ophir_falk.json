@@ -1,0 +1,18 @@
+{
+  "id": "19",
+  "name": "Ophir Falk",
+  "updatedAt": "2025-11-30",
+  "description": "Foreign policy advisor to the Prime Minister. #foreignpolicy #diplomacy #advisor #international",
+  "photo": "",
+  "positions": [
+    "Foreign Policy Advisor"
+  ],
+  "links": [
+    {
+      "targetId": "benjamin_netanyahu",
+      "updatedAt": "2025-11-30",
+      "description": "Foreign Policy Advisor",
+      "referenceUrl": "https://www.gov.il/en/pages/pm-netanyahu-meets-with-indian-commerce-and-industry-minister-piyush-goyal-23-nov-2025"
+    }
+  ]
+}
