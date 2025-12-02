@@ -1,0 +1,19 @@
+{
+  "id": "15",
+  "name": "Ron Dermer",
+  "updatedAt": "2025-11-30",
+  "description": "Minister of Strategic Affairs and one of Netanyahu's closest confidants. Former Ambassador to the US. #minister #strategy #diplomat #usa",
+  "photo": "",
+  "positions": [
+    "Minister of Strategic Affairs",
+    "Member of Security Cabinet"
+  ],
+  "links": [
+    {
+      "targetId": "benjamin_netanyahu",
+      "updatedAt": "2025-11-30",
+      "description": "Strategic Advisor & Minister",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Ron_Dermer"
+    }
+  ]
+}
