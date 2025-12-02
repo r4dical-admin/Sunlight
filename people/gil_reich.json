@@ -1,0 +1,19 @@
+{
+  "id": "10",
+  "name": "Gil Reich",
+  "updatedAt": "2025-11-30",
+  "description": "Acting National Security Advisor and Head of the National Security Council (NSC), following Tzachi Hanegbi. #security #nsc #defense #advisor",
+  "photo": "",
+  "positions": [
+    "Acting National Security Advisor",
+    "Head of National Security Council"
+  ],
+  "links": [
+    {
+      "targetId": "benjamin_netanyahu",
+      "updatedAt": "2025-11-30",
+      "description": "National Security Advisor",
+      "referenceUrl": "https://www.gov.il/en/departments/news/spoke-pm211025"
+    }
+  ]
+}
