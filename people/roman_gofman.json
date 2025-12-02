@@ -1,0 +1,18 @@
+{
+  "id": "14",
+  "name": "Roman Gofman",
+  "updatedAt": "2025-11-30",
+  "description": "Military Secretary to the Prime Minister. An IDF Major General who advises on military and intelligence affairs. #military #idf #security #general",
+  "photo": "",
+  "positions": [
+    "Military Secretary to the Prime Minister"
+  ],
+  "links": [
+    {
+      "targetId": "benjamin_netanyahu",
+      "updatedAt": "2025-11-30",
+      "description": "Senior Military Advisor",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Military_Secretary_to_the_Prime_Minister"
+    }
+  ]
+}
