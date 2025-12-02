@@ -1,0 +1,19 @@
+{
+  "id": "18",
+  "name": "Ofer Golan",
+  "updatedAt": "2025-11-30",
+  "description": "Long-serving political advisor and spokesperson for the Netanyahu family. #advisor #spokesperson #family #politics",
+  "photo": "",
+  "positions": [
+    "Political Advisor",
+    "Family Spokesperson"
+  ],
+  "links": [
+    {
+      "targetId": "benjamin_netanyahu",
+      "updatedAt": "2025-11-30",
+      "description": "Political Advisor",
+      "referenceUrl": "https://www.timesofisrael.com/3-senior-netanyahu-aides-indicted-for-witness-intimidation-in-pms-corruption-cases/"
+    }
+  ]
+}
