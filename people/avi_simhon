@@ -1,0 +1,18 @@
+{
+  "id": "20",
+  "name": "Avi Simhon",
+  "updatedAt": "2025-11-30",
+  "description": "Head of the National Economic Council. Chief economic advisor to the Prime Minister. #economics #policy #finance",
+  "photo": "",
+  "positions": [
+    "Head of National Economic Council"
+  ],
+  "links": [
+    {
+      "targetId": "benjamin_netanyahu",
+      "updatedAt": "2025-11-30",
+      "description": "Economic Advisor",
+      "referenceUrl": "https://www.gov.il/en/departments/units/pmo_general_director"
+    }
+  ]
+}
