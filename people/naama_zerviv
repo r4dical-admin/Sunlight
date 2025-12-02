@@ -1,0 +1,19 @@
+{
+  "id": "naama_zerviv",
+  "name": "Naama Zerviv",
+  "updatedAt": "2025-11-30",
+  "description": "Founder and CEO of Shovrot Shivyon. Social activist, mother of six, and grandmother. Holds an MBA and has extensive management experience including the Katif settlement and Ramla Torani core. #founder #ceo #activist #family",
+  "photo": "",
+  "positions": [
+    "Founder",
+    "Director"
+  ],
+  "links": [
+    {
+      "targetId": "shovrot_shivyon",
+      "updatedAt": "2025-11-30",
+      "description": "Team Page",
+      "referenceUrl": "https://shovrot.com/%D7%94%D7%A6%D7%95%D7%95%D7%AA/"
+    }
+  ]
+}
