@@ -1,0 +1,18 @@
+{
+  "id": "chana_katan",
+  "name": "Rabbanit Dr. Chana Katan",
+  "updatedAt": "2025-11-30",
+  "description": "Gynecologist, author, and publicist. Expert in fertility and family life. President of the Center for the Family and member of the National Council for Women's Health. #doctor #health #family #author",
+  "photo": "",
+  "positions": [
+    "Message Accuracy Team"
+  ],
+  "links": [
+    {
+      "targetId": "shovrot_shivyon",
+      "updatedAt": "2025-11-30",
+      "description": "Team Page",
+      "referenceUrl": "https://shovrot.com/%D7%94%D7%A6%D7%95%D7%95%D7%AA/"
+    }
+  ]
+}
