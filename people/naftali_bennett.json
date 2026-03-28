@@ -1,0 +1,20 @@
+{
+  "id": "naftali_bennett",
+  "name": "Naftali Bennett",
+  "updatedAt": "2026-03-28",
+  "description": "Israeli politician and former Prime Minister of Israel. #PrimeMinister #Israel #Politics",
+  "photo": "",
+  "positions": [
+    "Former Prime Minister of Israel",
+    "Former Minister of Defense",
+    "Former Minister of Education"
+  ],
+  "links": [
+    {
+      "targetId": "miri_regev",
+      "updatedAt": "2026-03-28",
+      "description": "Mentioned alongside Regev during her ministerial tenure",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    }
+  ]
+}

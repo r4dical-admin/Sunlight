@@ -1,0 +1,20 @@
+{
+  "id": "merav_michaeli",
+  "name": "Merav Michaeli",
+  "updatedAt": "2026-03-28",
+  "description": "Israeli politician who served as Minister of Transportation and Road Safety after Miri Regev in 2021. #Israel #Transportation #Labor",
+  "photo": "",
+  "positions": [
+    "Former Minister of Transportation and Road Safety",
+    "Former leader of the Israeli Labor Party",
+    "Member of Knesset"
+  ],
+  "links": [
+    {
+      "targetId": "miri_regev",
+      "updatedAt": "2026-03-28",
+      "description": "Succeeded Regev as Transportation Minister",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    }
+  ]
+}

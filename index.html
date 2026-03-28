@@ -73,7 +73,11 @@
         const { useState, useEffect, useRef } = React;
 
         // --- CONFIGURATION ---
-        const DATA_BASE_URL = "https://r4dical-admin.github.io/Sunlight/people";
+        const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+        const queryParams = new URLSearchParams(window.location.search);
+        const DATA_BASE_URL =
+            queryParams.get('dataBaseUrl') ||
+            (isLocalHost ? "./people" : "https://r4dical-admin.github.io/Sunlight/people");
         const REPO_URL = "https://github.com/r4dical-admin/Sunlight";
         const REPO_ISSUES_URL = "https://github.com/r4dical-admin/Sunlight/issues/new";
 

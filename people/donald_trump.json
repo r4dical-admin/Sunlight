@@ -1,0 +1,18 @@
+{
+  "id": "donald_trump",
+  "name": "Donald Trump",
+  "updatedAt": "2026-03-28",
+  "description": "American politician and 45th U.S. President; referenced in commentary comparing Regev's political style. #USA #President #Politics",
+  "photo": "",
+  "positions": [
+    "45th President of the United States"
+  ],
+  "links": [
+    {
+      "targetId": "miri_regev",
+      "updatedAt": "2026-03-28",
+      "description": "Referenced in commentary about Regev's political style",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    }
+  ]
+}

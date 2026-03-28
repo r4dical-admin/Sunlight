@@ -1,0 +1,20 @@
+{
+  "id": "ayelet_shaked",
+  "name": "Ayelet Shaked",
+  "updatedAt": "2026-03-28",
+  "description": "Israeli politician and former Justice Minister, previously a senior figure in right-wing Israeli politics. #Israel #Politics #Justice",
+  "photo": "",
+  "positions": [
+    "Former Minister of Justice",
+    "Former Minister of Interior",
+    "Former Member of Knesset"
+  ],
+  "links": [
+    {
+      "targetId": "miri_regev",
+      "updatedAt": "2026-03-28",
+      "description": "Appeared alongside Regev in government context",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    }
+  ]
+}

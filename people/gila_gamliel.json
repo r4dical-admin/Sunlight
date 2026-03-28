@@ -1,0 +1,19 @@
+{
+  "id": "gila_gamliel",
+  "name": "Gila Gamliel",
+  "updatedAt": "2026-03-28",
+  "description": "Israeli Likud politician and cabinet minister who publicly commented on Regev in political debates. #Likud #Israel #Minister",
+  "photo": "",
+  "positions": [
+    "Minister in the Israeli government",
+    "Member of Knesset (Likud)"
+  ],
+  "links": [
+    {
+      "targetId": "miri_regev",
+      "updatedAt": "2026-03-28",
+      "description": "Fellow Likud legislator who commented on Regev",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    }
+  ]
+}

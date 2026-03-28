@@ -1,0 +1,18 @@
+{
+  "id": "dror_regev",
+  "name": "Dror Regev",
+  "updatedAt": "2026-03-28",
+  "description": "Engineer at Israel Aerospace Industries and spouse of Miri Regev. #Israel #Engineer",
+  "photo": "",
+  "positions": [
+    "Engineer at Israel Aerospace Industries"
+  ],
+  "links": [
+    {
+      "targetId": "miri_regev",
+      "updatedAt": "2026-03-28",
+      "description": "Spouse of Miri Regev",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    }
+  ]
+}
