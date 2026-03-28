@@ -1,0 +1,20 @@
+{
+  "id": "bezalel_smotrich",
+  "name": "Bezalel Smotrich",
+  "updatedAt": "2026-03-28",
+  "description": "Israeli politician, leader of the Religious Zionist Party, and Minister of Finance. #Israel #Politics #Finance #ReligiousZionism",
+  "photo": "",
+  "positions": [
+    "Minister of Finance",
+    "Leader of the Religious Zionist Party",
+    "Member of Knesset"
+  ],
+  "links": [
+    {
+      "targetId": "miri_regev",
+      "updatedAt": "2026-03-28",
+      "description": "Cabinet colleague in Israeli government",
+      "referenceUrl": "https://he.wikipedia.org/wiki/%D7%9E%D7%99%D7%A8%D7%99_%D7%A8%D7%92%D7%91?wprov=sfla1"
+    }
+  ]
+}

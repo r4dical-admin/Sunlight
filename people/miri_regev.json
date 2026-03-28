@@ -1,0 +1,63 @@
+{
+  "id": "miri_regev",
+  "name": "Miri Regev",
+  "updatedAt": "2026-03-28",
+  "description": "Israeli politician, Minister of Transportation and Road Safety, former Minister of Culture and Sport, and former IDF spokesperson. #Likud #Knesset #Israel #Transportation #Culture",
+  "photo": "",
+  "positions": [
+    "Minister of Transportation and Road Safety",
+    "Former Minister of Culture and Sport",
+    "Member of Knesset (Likud)",
+    "Former IDF Spokesperson (Brigadier General)"
+  ],
+  "links": [
+    {
+      "targetId": "benjamin_netanyahu",
+      "updatedAt": "2026-03-28",
+      "description": "Served in governments led by Netanyahu",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    },
+    {
+      "targetId": "ayelet_shaked",
+      "updatedAt": "2026-03-28",
+      "description": "Cabinet colleague in Israeli government",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    },
+    {
+      "targetId": "naftali_bennett",
+      "updatedAt": "2026-03-28",
+      "description": "Cabinet colleague in Israeli government",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    },
+    {
+      "targetId": "merav_michaeli",
+      "updatedAt": "2026-03-28",
+      "description": "Succeeded Regev as Transportation Minister in 2021",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    },
+    {
+      "targetId": "gila_gamliel",
+      "updatedAt": "2026-03-28",
+      "description": "Fellow Likud legislator mentioned in political debate",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    },
+    {
+      "targetId": "avi_benayahu",
+      "updatedAt": "2026-03-28",
+      "description": "Succeeded Regev as IDF spokesperson",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    },
+    {
+      "targetId": "donald_trump",
+      "updatedAt": "2026-03-28",
+      "description": "Compared to Regev in political commentary",
+      "referenceUrl": "https://en.wikipedia.org/wiki/Miri_Regev"
+    },
+    {
+      "targetId": "bezalel_smotrich",
+      "updatedAt": "2026-03-28",
+      "description": "Cabinet colleague in Israeli government",
+      "referenceUrl": "https://he.wikipedia.org/wiki/%D7%9E%D7%99%D7%A8%D7%99_%D7%A8%D7%92%D7%91?wprov=sfla1"
+    }
+  ]
+}
